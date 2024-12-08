@@ -6,12 +6,12 @@ function App() {
   const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState('');
 
-  const apiUrl = 'http://localhost:3000/create';
+  const apiUrl = 'http://localhost:3000/todos/create';
 
   // Fetch todos from the server
   const fetchTodos = async () => {
     try {
-      const { data } = await axios.get('http://localhost:3000/todos');
+      const { data } = await axios.get('http://localhost:3000/todos/getAll');
       console.log('data', data);
       setTodos(data);
     } catch (error) {
@@ -33,21 +33,26 @@ function App() {
   };
 
   // // Update a todo
-  const updateTodo = async (id, markCompleted, isCompleted) => {
+  const updateTodo = async (todo, markCompleted) => {
     console.log('mark completed', markCompleted);
+
+
     if(!markCompleted){
       if (!newTodo.trim()) return;
     }
+    console.log('before updating', todo);
+    if(markCompleted){
+      todo.completed = !todo.completed;
+    } else {
+      todo.title = newTodo;
+    }
+
+    console.log('after updating', todo);
+    // todo updated in database
+
     try {
-      let data;
-      if(markCompleted) {
-        console.log('frontend requesting to mark completed to backend');
-        const res = await axios.put(`http://localhost:3000/update/${id}`, {completed: isCompleted});
-        data = res.data;
-      } else {
-        const res = await axios.put(`http://localhost:3000/update/${id}`, {title: newTodo});
-        data = res.data;
-      }
+      const res = await axios.put(`http://localhost:3000/todos/update/${todo._id}`, todo);
+      const data = res.data;
       console.log('data', data);
       setTodos(data.data);
     } catch (error) {
@@ -58,7 +63,7 @@ function App() {
   // // Delete a todo
   const deleteTodo = async (id) => {
     try {
-      const {data} = await axios.delete(`http://localhost:3000/delete/${id}`);
+      const {data} = await axios.delete(`http://localhost:3000/todos/delete/${id}`);
       console.log('data', data);
       setTodos(data.data);
     } catch (error) {
@@ -66,27 +71,10 @@ function App() {
     }
   };
 
-  // // Toggle completion status
-  // const toggleCompletion = async (id) => {
-  //   const todo = todos.find((todo) => todo.id === id);
-  //   if (!todo) return;
-  //   try {
-  //     const { data } = await axios.put(`${apiUrl}/${id}`, {
-  //       completed: !todo.completed,
-  //     });
-  //     setTodos(todos.map((t) => (t.id === id ? data : t)));
-  //   } catch (error) {
-  //     console.error('Error toggling completion:', error);
-  //   }
-  // };
 
   useEffect(() => {
     fetchTodos(); 
   }, []);
-
-  // const functionCalled = () => {
-  //   console.log('function called');
-  // }
 
   return (
     <div className="flex h-full w-full justify-center bg-black min-h-screen">
@@ -118,7 +106,7 @@ function App() {
               <input
                 type="checkbox"
                 checked={todo.completed}
-                onChange={() => updateTodo(todo.id, true, !todo.completed)}
+                onChange={() => updateTodo(todo, true)}
               />
               <div
                 className={`text-white cursor-pointer ${
@@ -130,12 +118,12 @@ function App() {
 
               <button
                 className='px-2 py-1'
-                onClick={() => updateTodo(todo.id, false)}
+                onClick={() => updateTodo(todo, false)}
               >
                 Edit
               </button>
               <button
-                onClick={() => deleteTodo(todo.id)}
+                onClick={() => deleteTodo(todo._id)}
                 className="px-2 py-1 text-red-500 hover:text-red-700"
               >
                 Delete
