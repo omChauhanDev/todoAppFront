@@ -5,13 +5,13 @@ import './App.css';
 function App() {
   const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState('');
-
-  const apiUrl = 'http://localhost:3000/todos/create';
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  
 
   // Fetch todos from the server
   const fetchTodos = async () => {
     try {
-      const { data } = await axios.get('http://localhost:3000/todos/getAll');
+      const { data } = await axios.get(`${backendUrl}/todos/getAll`);
       console.log('data', data);
       setTodos(data);
     } catch (error) {
@@ -23,7 +23,7 @@ function App() {
   const addTodo = async () => {
     if (!newTodo.trim()) return;
     try {
-      const { data } = await axios.post(apiUrl, { title: newTodo });
+      const { data } = await axios.post(`${backendUrl}/todos/create`, { title: newTodo });
       console.log('data', data);
       setTodos(data.data);
       setNewTodo(''); // Clear input field
@@ -51,7 +51,7 @@ function App() {
     // todo updated in database
 
     try {
-      const res = await axios.put(`http://localhost:3000/todos/update/${todo._id}`, todo);
+      const res = await axios.put(`${backendUrl}/todos/update/${todo._id}`, todo);
       const data = res.data;
       console.log('data', data);
       setTodos(data.data);
@@ -63,7 +63,7 @@ function App() {
   // // Delete a todo
   const deleteTodo = async (id) => {
     try {
-      const {data} = await axios.delete(`http://localhost:3000/todos/delete/${id}`);
+      const {data} = await axios.delete(`${backendUrl}/todos/delete/${id}`);
       console.log('data', data);
       setTodos(data.data);
     } catch (error) {
