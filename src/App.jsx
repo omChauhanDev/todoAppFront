@@ -3,6 +3,7 @@ import "./App.css";
 import { fetchTodos, addTodo, updateTodo } from "./actions/todoActions";
 import DateAndTime from "./components/DateAndTime";
 import Todo from "./components/Todo";
+import { PulseLoader } from "react-spinners";
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -10,6 +11,7 @@ function App() {
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const [editMode, setEditMode] = useState(false);
   const [focusTodo, setFocusTodo] = useState({});
+  const [loadingTodos, setLoadingTodos] = useState(true);
 
   const inputRef = useRef(null);
 
@@ -22,7 +24,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    fetchTodos(setTodos);
+    fetchTodos(setTodos, setLoadingTodos);
   }, []);
 
   const editModeHandler = (mode, todo) => {
@@ -81,29 +83,35 @@ function App() {
             <div className='flex items-center gap-2 justify-around'>
               <button
                 onClick={updateHandler}
-                className='px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700'
+                className='px-6 py-2 bg-[#8d0090] text-white rounded-md hover:bg-[#800083]'
               >
                 Update
               </button>
               <button
                 onClick={() => editModeHandler(false)}
-                className='px-6 py-2 bg-red-700 text-white rounded-md hover:bg-red-800'
+                className='px-6 py-2 bg-red-800 text-white rounded-md hover:bg-red-900'
               >
                 Cancel
               </button>
             </div>
           </div>
         )}
-        <div className='w-full mt-6'>
-          {todos.map((todo) => (
-            <Todo
-              key={todo._id}
-              todo={todo}
-              setTodos={setTodos}
-              editModeHandler={editModeHandler}
-            />
-          ))}
-        </div>
+        {loadingTodos ? (
+          <div className='w-full mt-32 flex justify-center items-center text-2xl text-white'>
+            <PulseLoader color='#fff' size={10} />
+          </div>
+        ) : (
+          <div className='w-full mt-6'>
+            {todos.map((todo) => (
+              <Todo
+                key={todo._id}
+                todo={todo}
+                setTodos={setTodos}
+                editModeHandler={editModeHandler}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
