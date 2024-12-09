@@ -6,7 +6,7 @@ function App() {
   const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState('');
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  
+
 
   // Fetch todos from the server
   const fetchTodos = async () => {
@@ -98,7 +98,7 @@ function App() {
         <div className="w-full">
           {todos.map((todo) => (
             <div
-              key={todo.id}
+              key={todo._id}
               className={`flex items-center justify-between p-4 mb-2 rounded ${
                 todo.completed ? 'bg-green-700' : 'bg-gray-800'
               }`}
